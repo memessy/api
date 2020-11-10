@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"memessy-api/pkg/api/meme"
 	"net/http"
 )
@@ -19,6 +20,15 @@ func NewApi(
 ) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
+
 	r.Post("/memes/", memeResource.Create)
 	r.Get("/memes/", memeResource.List)
 	r.Route("/memes/{memeId}", func(r chi.Router) {
